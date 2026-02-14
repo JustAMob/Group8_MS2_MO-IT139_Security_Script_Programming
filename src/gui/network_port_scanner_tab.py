@@ -1,13 +1,5 @@
 # src/gui/network_portscanner_tab.py
 
-'''References for port presets: 
-1) Common Ports by Service Category: https://www.stationx.net/common-ports-cheat-sheet/
-2) Game-specific ports (e.g. Steam, Valorant)
-- Steam: https://help.steampowered.com/en/faqs/view/2EA8-4D75-DA21-31EB
-- Valorant: https://support-valorant.riotgames.com/hc/en-us/articles/4402306473619-How-to-Set-Up-Port-Forwarding
-'''
-
-
 import tkinter as tk
 from tkinter import messagebox, ttk
 import threading
@@ -17,8 +9,14 @@ import os
 # Add src to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from features.network_port_scanner import scan_port, validate_host
-from utils.validators import validate_port_range
+from features.network_port_scanner import (
+    scan_port, 
+    validate_host, 
+    validate_port_range,
+    get_service_name,
+    COMMON_PORTS_BY_CATEGORY,
+    PORT_PRESETS
+)
 
 # PASSECURIST (MS1) Theme Colors
 BG_COLOR = "#0f172a"
@@ -34,146 +32,9 @@ ERROR_COLOR = "#ef4444"
 WARNING_COLOR = "#f59e0b"
 DETAIL_COLOR = "#94a3b8"
 
-# Common Ports by Category
-COMMON_PORTS_BY_CATEGORY = {
-    "Web Services": [
-        ("80", "HTTP"),
-        ("443", "HTTPS")
-    ],
-    "Mail Services": [
-        ("25", "SMTP"),
-        ("110", "POP3"),
-        ("143", "IMAP")
-    ],
-    "Remote Access & Management": [
-        ("22", "SSH/SCP"),
-        ("23", "Telnet"),
-        ("3389", "RDP")
-    ],
-    "Directory / Authentication": [
-        ("88", "Kerberos"),
-        ("389", "LDAP"),
-        ("464", "Kerberos password settings"),
-        ("636", "LDAPS")
-    ],
-    "File Transfer & Sharing": [
-        ("20/21", "FTP"),
-        ("69", "TFTP"),
-        ("445", "SMB")
-    ],
-    "Network Core": [
-        ("53", "DNS"),
-        ("67, 68", "DHCP / BOOTP"),
-        ("123", "NTP")
-    ],
-    "Network Management & Monitoring": [
-        ("161", "SNMP")
-    ],
-    "Communication, VoIP, and Chat": [
-        ("194", "IRC"),
-        ("1720", "H.323"),
-        ("5060", "SIP"),
-        ("5061", "SIP over TLS")
-    ],
-    "Legacy and Testing": [
-        ("7", "Echo"),
-        ("23", "Telnet")
-    ]
-}
-
-# Port Presets/Dropdown Options - common ports + gaming ports
-PORT_PRESETS = {
-    "Select": {
-        "ports": [],
-        "start": "20",
-        "end": "100",
-        "description": "Choose a port type"
-    },
-    "Web Services": {
-        "ports": ["80", "443"],
-        "start": "80",
-        "end": "443",
-        "description": "HTTP and HTTPS ports"
-    },
-    "Mail Services": {
-        "ports": ["25", "110", "143"],
-        "start": "25",
-        "end": "143",
-        "description": "SMTP, POP3, and IMAP ports"
-    },
-    "Remote Access & Management": {
-        "ports": ["22", "23", "3389"],
-        "start": "22",
-        "end": "3389",
-        "description": "SSH, Telnet, and RDP ports"
-    },
-    "Directory / Authentication": {
-        "ports": ["88", "389", "464", "636"],
-        "start": "88",
-        "end": "636",
-        "description": "Kerberos, LDAP ports"
-    },
-    "File Transfer & Sharing": {
-        "ports": ["20", "21", "69", "445"],
-        "start": "20",
-        "end": "445",
-        "description": "FTP, TFTP, SMB ports"
-    },
-    "Network Core": {
-        "ports": ["53", "67", "68", "123"],
-        "start": "53",
-        "end": "123",
-        "description": "DNS, DHCP, NTP ports"
-    },
-    "Network Management & Monitoring": {
-        "ports": ["161"],
-        "start": "161",
-        "end": "161",
-        "description": "SNMP port"
-    },
-    "Communication, VoIP, and Chat": {
-        "ports": ["194", "1720", "5060", "5061"],
-        "start": "194",
-        "end": "5061",
-        "description": "IRC, H.323, SIP ports"
-    },
-    "Legacy and Testing": {
-        "ports": ["7", "23"],
-        "start": "7",
-        "end": "23",
-        "description": "Echo and Telnet ports"
-    },
-    "Steam": {
-        "ports": ["80", "443", "27000-27100"],
-        "start": "80",
-        "end": "27100",
-        "description": "Steam platform ports"
-    },
-    "Valorant": {
-        "ports": ["80", "443", "7000-8000"],
-        "start": "80",
-        "end": "8400",
-        "description": "Valorant game ports"
-    }
-}
-
-# Quick lookup (port-to-service mapping)
-PORT_SERVICE_MAP = {}
-for category, ports in COMMON_PORTS_BY_CATEGORY.items():
-    for port_str, service in ports:
-        # Handle multiple ports like "20/21" or "67, 68"
-        if '/' in port_str:
-            for p in port_str.split('/'):
-                PORT_SERVICE_MAP[int(p.strip())] = service
-        elif ',' in port_str:
-            for p in port_str.split(','):
-                PORT_SERVICE_MAP[int(p.strip())] = service
-        else:
-            PORT_SERVICE_MAP[int(port_str)] = service
-
 
 class NetworkPortScannerTab:
-    #GUI for Network Port Scanner with table results
+    """GUI for Network Port Scanner with table results"""
     
     def __init__(self, parent):
         self.parent = parent
@@ -515,18 +376,18 @@ class NetworkPortScannerTab:
             self.port_status.config(text=f"⚠ {error_msg}", fg=ERROR_COLOR)
             return False
     
-    # Clear table results
     def clear_results(self):
+        """Clear table results"""
         for item in self.results_tree.get_children():
             self.results_tree.delete(item)
     
-    # Stop scanning/results
     def stop_scan(self):
+        """Stop scanning/results"""
         self.scan_cancelled = True
         self.stop_button.config(state="disabled")
     
-    # Start scan
     def start_scan(self):
+        """Start scan"""
         if self.is_scanning:
             messagebox.showwarning("Scanning", "Already scanning!")
             return
@@ -551,6 +412,7 @@ class NetworkPortScannerTab:
                         daemon=True).start()
     
     def perform_scan(self, host, start_port, end_port):
+        """Execute the actual port scanning operation"""
         try:
             # Display scanning message
             print(f"Scanning host: {host}")
@@ -564,8 +426,8 @@ class NetworkPortScannerTab:
                 status = "OPEN" if is_open else "CLOSED"
                 tag = "open" if is_open else "closed"
                 
-                # Get service name if available
-                service_name = PORT_SERVICE_MAP.get(port, "Unknown Service")
+                # Get service name using the function from network_port_scanner
+                service_name = get_service_name(port)
                 
                 # Console output for real-time feedback
                 print(f"Port {port}: {status}")

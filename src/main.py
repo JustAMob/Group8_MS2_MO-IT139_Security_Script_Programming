@@ -8,7 +8,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import the GUI
-from gui.network_portscanner_tab import NetworkPortScannerTab
+from gui.network_port_scanner_tab import NetworkPortScannerTab
 
 root = tk.Tk()
 root.title("🛡️ PASSECURIST - Network Port Scanner")
