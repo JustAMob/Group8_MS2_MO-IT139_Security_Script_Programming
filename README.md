@@ -44,11 +44,8 @@ python src/main.py
 ### Features (`src/features/`)
 - **network_port_scanner.py** - Port scanning logic using socket connections
 
-### Utilities (`src/utils/`)
-- **validators.py** - Input validation for hosts and port ranges
-
 ### GUI (`src/gui/`)
-- **network_portscanner_tab.py** - Scanner interface with grid-based table layout
+- **network_port_scanner_tab.py** - Scanner interface with grid-based table layout
 
 ---
 
@@ -97,6 +94,11 @@ threading (built-in)
 - Grid-based results display with service mapping
 - Stop/clear/resume functionality
 - Professional dark theme UI
+
+### Week 5 - Homework - February 15, 2026
+**Network Port Scanner Implementation**:
+- Removed validators.py and transferred the code to network_port_scanner.py
+
 
 **Code Structure**:
 - Modular architecture (features, GUI, utilities)
