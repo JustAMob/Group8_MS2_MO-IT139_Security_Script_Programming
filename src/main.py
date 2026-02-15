@@ -109,7 +109,7 @@ class PassecuristApp:
                 fg=ACCENT_COLOR, bg=BG_COLOR).pack()
         
         tk.Label(header_frame, 
-                text="Professional Network Security & Analysis Tools",
+                text="Basic Network Security & Analysis Tools",
                 font=("Segoe UI", 14),
                 fg=TEXT_MAIN, bg=BG_COLOR).pack(pady=(10, 5))
         

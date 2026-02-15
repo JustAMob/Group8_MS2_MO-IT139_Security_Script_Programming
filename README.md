@@ -11,7 +11,7 @@ A basic network security toolkit featuring port scanning and traffic analysis ca
 
 ### Homepage
 - Card-based navigation with hover glow effects
-- Professional branding and tool descriptions
+- Tool descriptions
 - Easy access to all security tools
 
 ### 1. Network Port Scanner
@@ -155,7 +155,7 @@ datetime (built-in)
 - Comprehensive common ports reference table
 - Grid-based results display with service mapping
 - Stop/clear/resume functionality
-- Professional dark theme UI
+- Dark theme UI
 
 **Code Structure**:
 - Modular architecture (features, GUI, utilities)
