@@ -1,4 +1,4 @@
-# src/gui/network_portscanner_tab.py
+# src/gui/network_port_scanner_tab.py
 
 import tkinter as tk
 from tkinter import messagebox, ttk
